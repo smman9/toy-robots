@@ -12,7 +12,7 @@ class Robot
         puts "#{name}: #{x},#{y},#{facing}"
     end
 
-    def move_robot(free_spaces)
+    def move(free_spaces)
         destination = [@x, @y]
         case @facing
         when "NORTH"

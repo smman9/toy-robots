@@ -20,65 +20,56 @@ class GameManager
             end
         end
     end
+	
+	def place_robot(name, coord_array)
+		robot_x = coord_array[0].to_i
+		robot_y = coord_array[1].to_i
+		if @free_spaces.include?([robot_x, robot_y])
+			new_robot = Robot.new({name: name, x: robot_x, y: robot_y, facing:coord_array[2]})
+			@robots.push(new_robot)
+			@free_spaces.delete([robot_x, robot_y])
+			puts "New Robot #{name} created at #{robot_x}, #{robot_y}, facing #{coord_array[2]}"    
+		else
+			puts "invalid command: space #{robot_x}, #{robot_y} is not free"
+		end
+	end
 
-    def evaluate_command(command_array)
-        #command_array should look like [NAME:, COMMAND, (COORDS+FACING)]
-        #TODO: consider breaking into methods?
-        name = command_array[0].chomp.delete_suffix!(":")
-        command_operator = command_array[1]
+	def move_robot(name)
+		target_robot = find_robot_by_name(name)
+		if target_robot != nil
+			old_location = [target_robot.x, target_robot.y]
+			new_location = target_robot.move(@free_spaces)
+			if new_location != nil
+				@free_spaces.delete(new_location)
+				@free_spaces.add(old_location) 
+			end
+		end
+	end
 
-        case command_operator
-        when "PLACE"
-            robot_array = command_array[2].delete(" ").split(",")
-            robot_x = robot_array[0].to_i
-            robot_y = robot_array[1].to_i
-            if @free_spaces.include?([robot_x, robot_y])
-                new_robot = Robot.new({name: name, x: robot_x, y: robot_y, facing:robot_array[2]})
-                @robots.push(new_robot)
-                @free_spaces.delete([robot_x, robot_y])
-                puts "New Robot #{name} created at #{robot_x}, #{robot_y}, facing #{robot_array[2]}"    
-            else
-                puts "invalid command: space #{robot_x}, #{robot_y} is not free"
-            end 
+	def robot_status(name)
+		target_robot = find_robot_by_name(name)
+		if target_robot != nil
+			target_robot.status
+		end
+	end
 
-        when "MOVE"
-            target_robot = find_robot_by_name(name)
-            if target_robot != nil
-                old_location = [robot.x, robot.y]
-                new_location = target_robot.move_robot(@free_spaces)
-                if new_location != nil
-                    @free_spaces.delete(new_location)
-                    @free_spaces.push(old_location) 
-                end
-            end
-
-        when "REPORT"
-            target_robot = find_robot_by_name(name)
-            if target_robot != nil
-                target_robot.status
-            end
-            
-        #TODO: rework movement to be more extensible. this shit WET
-        when "LEFT"
-            target_robot = find_robot_by_name(name)
-                if target_robot != nil
-                    i = @FACINGS.find_index(target_robot.facing)
-                    new_facing = @FACINGS[(i-1) % @FACINGS.length]
-                    target_robot.facing = new_facing
-                end 
-
-        when "RIGHT"
-            target_robot = find_robot_by_name(name)
-                if target_robot != nil
-                    i = @FACINGS.find_index(target_robot.facing)
-                    new_facing = @FACINGS[(i+1) % @FACINGS.length]
-                    target_robot.facing = new_facing
-                end 
-
-        else
-            puts "invalid command"
-        end
-    end
+	def turn_robot(name, direction)
+		target_robot = find_robot_by_name(name)
+		#switch in case we want different directions in the future, like turn around 
+		if target_robot != nil
+			i = @FACINGS.find_index(target_robot.facing)
+			case direction
+			when "LEFT"
+				i -= 1
+			when "RIGHT"
+				i += 1
+			else
+				puts "invalid command: invalid direction"
+			end
+			new_facing = @FACINGS[(i) % @FACINGS.length]
+			target_robot.facing = new_facing		
+		end
+	end
 
     def index_of_robot(name)
         @robots.index { |robot| robot.name == name}
