@@ -15,9 +15,14 @@ while true
     exit if input.include? "EXIT"
     
     input_array = input.split(" ")
-
+    puts input_array
     if input_array.length > 3 || input_array.length <= 1
-        puts "invalid command: argument error"
+        puts "invalid command: argument error1"
+        next
+    end
+
+    if input_array.include?(nil)
+        puts "invalid command: argument error2"
         next
     end
 
