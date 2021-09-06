@@ -16,8 +16,8 @@ while true
     
     input_array = input.split(" ")
 
-    if input_array.length > 3
-        puts "invalid command: too many arguments"
+    if input_array.length > 3 || input_array.length <= 1
+        puts "invalid command: argument error"
         next
     end
 
