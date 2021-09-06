@@ -1,13 +1,12 @@
 #!/usr/bin/env ruby
 require 'set'
-require_relative 'classes/robot'
-require_relative 'classes/GameManager.rb'
+require_relative 'lib/robot'
+require_relative 'lib/GameManager.rb'
 
 size_x = 6
 size_y = 6
 
 game_manager = GameManager.new(size_x, size_y)
-game_manager.create_grid
 
 while true
     puts "Enter Command:"
@@ -19,6 +18,7 @@ while true
 
     if input_array.length > 3
         puts "invalid command: too many arguments"
+        next
     end
 
     name = input_array[0].chomp.delete_suffix!(":")
